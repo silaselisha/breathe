@@ -1,0 +1,4 @@
+BASE_URL=https://accounts.spotify.com/api/token
+CLIENT_SECRET=2ddaa0ef262a409384d1a1f5272c2080
+CLIENT_ID=9238325033794f1abb4383e8f0edfea6
+GRANT_TYPE=client_credentials
