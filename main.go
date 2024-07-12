@@ -35,7 +35,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	monitor_breathe_playlist(*access_token)
+	_ = fetch_breathe_playlist(*access_token)
+	redis_con()
 }
 
 func generate_req_paylod(payload request_params) url.Values {

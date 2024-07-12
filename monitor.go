@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func monitor_breathe_playlist(token access_token_params) {
+func fetch_breathe_playlist(token access_token_params) (output []byte) {
 	req, err := http_request(http.MethodGet, os.Getenv("PLAYLIST_URL"), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -18,13 +18,15 @@ func monitor_breathe_playlist(token access_token_params) {
 	tracks, err := http_response[tracks](req)
 	if err != nil {
 		log.Panic(err)
+		return
 	}
 
-	output, err := json.MarshalIndent(tracks, "", " ")
+	output, err = json.MarshalIndent(tracks, "", " ")
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
+		return
 	}
-	if err := os.WriteFile("breathe.json", output, 0644); err != nil {
-		log.Fatal(err)
-	}
+
+	// store tracks in REDIS
+	return
 }
