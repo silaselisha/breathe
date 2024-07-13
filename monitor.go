@@ -27,6 +27,5 @@ func fetch_breathe_playlist(token access_token_params) (output []byte) {
 		return
 	}
 
-	// store tracks in REDIS
 	return
 }

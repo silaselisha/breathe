@@ -1,5 +1,3 @@
-## Test Environemnt Variables
+a regular playlist sanitizer and a reminder for plagurized tracks 😎
 
-```bash
-cp ./specification.txt ./.env
-```
+!["breathe arch"]("./public/image/breathe.png")

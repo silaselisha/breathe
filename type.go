@@ -35,10 +35,10 @@ type artist struct {
 }
 
 type album struct {
-	AlbumType        string   `json:"album_type"`
-	TotalTracks      int32    `json:"total_tracks"`
+	AlbumType   string `json:"album_type"`
+	TotalTracks int32  `json:"total_tracks"`
 	// AvailableMarkets []string `json:"available_markets"`
-	ExternalUrls     struct {
+	ExternalUrls struct {
 		Spotify string `json:"spotify"`
 	} `json:"external_urls"`
 	Href   string `json:"href"`
