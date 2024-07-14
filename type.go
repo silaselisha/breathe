@@ -99,3 +99,17 @@ type tracks struct {
 		Items []item `json:"items"`
 	} `json:"tracks"`
 }
+
+type LinkeListI[T trackType] interface {
+	push(element T)
+}
+
+type LinkedList[T trackType] struct {
+	head  *Node[T]
+	count int32
+}
+
+type Node[T trackType] struct {
+	element T
+	next    *Node[T]
+}
