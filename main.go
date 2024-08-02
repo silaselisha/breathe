@@ -46,14 +46,37 @@ func main() {
 
 	log.Printf("Fetched playlist with %d tracks", playlist.Tracks.Total)
 
-	// TODO: Implement sanitizer and plagiarism checker
-	// sanitizedPlaylist := sanitizePlaylist(playlist)
-	// plagiarizedTracks := checkPlagiarism(sanitizedPlaylist)
+	// TODO: Implementing sanitizer and plagiarism checker
+	sanitizedPlaylist := sanitizePlaylist(playlist)
+	plagiarizedTracks := checkPlagiarism(sanitizedPlaylist)
+
+	linkedList := &LinkedList[item]{}
+	for _, item := range sanitizePlaylist.Tracks.Items {
+	linkedList.push(item)
+	}
 
 	redisClient := redis_con()
 	defer redisClient.Close()
 
 	// TODO: Implement Redis operations
+	//
+	// Storing sanitized Playlists
+    sanitizedPlaylistJSON, _ := json.Marshal(sanitizedPlaylist)
+    err = redisClient.Set(ctx, "sanitized_playlist", sanitizedPlaylistJSON, 0).Err()
+    if err != nil {
+        log.Printf("Failed to store sanitized playlist in Redis: %v",err)
+    // Storing plagiarized tracks on redis
+    plagiarizedTracksJSON, _ := json.Marshal(plagiarizedTracks)
+    err = redisClient.Set(ctx, "plagiarized_tracks", plagiarizedTracksJSON, 0).Err()
+    if err != nil {
+        log.Printf("Failed to store plagiarized tracks in Redis: %v", err)
+        }
+        log.Printf("Number of plagiarized tracks: %d", len(plagiarizedTracks))
+        for _, track := range plagiarizedTracks {
+            log.Printf("Plagiarized track: %s", track)
+        }
+// TODO: Implementing a feedback loop from Redis to breathe component
+// // TODO: Implementing a flush redisdb button (maybe)?
 }
 
 func generate_req_paylod(payload request_params) url.Values {
@@ -63,6 +86,46 @@ func generate_req_paylod(payload request_params) url.Values {
 	values.Set("grant_type", payload.GrantType)
 	return values
 }
+
+http.HandleFunc("/playlist", func(w http.ResponseWriter, r *http.Request) {
+    sanitizedPlaylistJSON, err := redisClient.Get(ctx, "sanitized_playlist").Result()
+    if err != nil {
+        http.Error(w, "Failed to retrieve playlist", http.StatusInternalServerError)
+        return
+    }
+    w.Header().Set("Content-Type", "application/json")
+    w.Write([]byte(sanitizedPlaylistJSON))
+})
+
+http.HandleFunc("/plagiarized", func(w http.ResponseWriter, r *http.Request) {
+    plagiarizedTracksJSON, err := redisClient.Get(ctx, "plagiarized_tracks").Result()
+    if err != nil {
+        http.Error(w, "Failed to retrieve plagiarized tracks", http.StatusInternalServerError)
+        return
+    }
+    w.Header().Set("Content-Type", "application/json")
+    w.Write([]byte(plagiarizedTracksJSON))
+})
+
+log.Fatal(http.ListenAndServe(":8080", nil))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // package main
 
