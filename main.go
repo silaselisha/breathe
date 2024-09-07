@@ -8,6 +8,10 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+
+	"github.com/silaselisha/breathe/common"
+	"github.com/silaselisha/breathe/pkg/handler"
+	"github.com/silaselisha/breathe/pkg/types"
 )
 
 func main() {
@@ -16,34 +20,40 @@ func main() {
 		log.Fatal(err)
 	}
 
-	payload := request_params{
+	payload := types.ReqParam{
 		GrantType:    os.Getenv("GRANT_TYPE"),
 		ClientId:     os.Getenv("CLIENT_ID"),
 		ClientSecret: os.Getenv("CLIENT_SECRET"),
 	}
 
 	base_url := os.Getenv("BASE_URL")
-	values := generate_req_paylod(payload)
+	values := reqPayloadGen(&payload)
 
-	req, err := http_request(http.MethodPost, base_url, strings.NewReader(values.Encode()))
+	req, err := common.HTTPRequest(
+		http.MethodPost,
+		base_url,
+		strings.NewReader(values.Encode()),
+	)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	access_token, err := http_response[access_token_params](req)
+	token, err := common.HTTPResponse[*types.ATokenParam](req)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
-	_ = fetch_breathe_playlist(*access_token)
-	redis_con()
+	_, err = handler.CheckPlaylist(*token)
+	if err != nil {
+		panic(err)
+	}
 }
 
-func generate_req_paylod(payload request_params) url.Values {
+func reqPayloadGen(pld *types.ReqParam) url.Values {
 	values := url.Values{}
-	values.Set("client_secret", payload.ClientSecret)
-	values.Set("client_id", payload.ClientId)
-	values.Set("grant_type", payload.GrantType)
+	values.Set("client_secret", pld.ClientSecret)
+	values.Set("client_id", pld.ClientId)
+	values.Set("grant_type", pld.GrantType)
 
 	return values
 }
